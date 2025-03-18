@@ -15,8 +15,17 @@ from handlers.emails import EmailBot
 from handlers.slack import SlackBot
 from test_hexes.mock_bayestar_event import makeBayestarMock
 import datetime
+from tests import testHandler
 
-allowedModes = ["test","all","test g","test x","test u","test r","test v"]
+allowedModes = ["test","all","test g","test x","test r","test v"]
+allowedChars = ["g","x","r","v"]
+
+# Gamma ray: Einstein probe  gcn.notices.einstein_probe.wxt.alert
+# X ray: Swift gcn.notices.swift.bat.guano
+# Radio: No great option, yet
+# Neutrino: IceCube : gcn.notices.icecube.lvk_nu_track_search
+
+# Other sources to consider: SuperNova Early Warning System (SNEWS)
 
 def elapsedTimeString(start):
     elapsed = int(time.time() - start)
@@ -27,10 +36,10 @@ if __name__ == "__main__":
     parser.add_argument('--mode',
                         default='all',
                         help='Chose a `mode` for listen to gcn alerts. ' +\
-                        'Default mode is `all`, which will include gamma ray (g), x-ray (x), UV (u), radio (r), and neutrino events (v).' +\
+                        'Default mode is `all`, which will include gamma ray (g), x-ray (x), radio (r), and neutrino events (v).' +\
                         'For offline testing of all modes, use `test` mode. ' +\
                         'For offline testing of one mode, use `test P`, where `P` is one of the chars associated with a different messenger'
-                        choices=['all', 'test', 'observation'])
+                        choices=allowedModes)
 
     args = parser.parse_args()
     mode = args.mode
@@ -47,40 +56,23 @@ if __name__ == "__main__":
         slack_bot.post_message("","Starting `listener.py` for auxiliary injector")
 
     if mode == 'test':
-        print('Reading test event...')
-        """
-        The below is leftover from the original main injector script
-        As different modes are developed, the below will have to be modified
-
-
-        fake_alert_list = glob.glob('/data/des70.a/data/desgw/O4/Main-Injector-O4b/OUTPUT/TESTING/MS240413p/UPDATE/MS240413p.json')
-        print('Passing event to Handler - Listener took '+elapsedTimeString(start_time), flush=True)
-        for fake_alert in fake_alert_list:
-            with open(fake_alert, 'r', encoding='utf-8') as f:
-                gcn_fake_alert = json.load(f)
-            # slack_bot.post_message("","Starting handler on test event: {}".format(gcn_fake_alert['superevent_id']))
-            gw_streamer.handle(gcn_fake_alert)
-        """
-
-    	
+        print('Reading test events...')
+        for character in allowedChars:
+            postString = "Starting test handler for mode {}".format(character)
+            slack_bot.post_message("",postString)
+            print(postString)
+            testHandler(character)
+            	
     elif mode.startswith('test'):
-        testModes = mode.split(" ")[1] # These are the modes that are to be started for testing
+        testModes = list(mode.split(" ")[1]) # These are the modes that are to be started for testing, all chars
         
-        """
-        Below is leftover from Main-injector
+        for mode in testModes:
+            postString = "Starting test handler for mode {}".format(mode)
+            slack_bot.post_message("",postString)
+            print(postString)
+            testHandler(mode)
 
-
-        print('Simulating BAYESTAR event...', flush=True)
-        fake_alert = makeBayestarMock()
-        with open(fake_alert, 'r', encoding='utf-8') as f:
-            gcn_fake_alert = json.load(f)
-
-        print('Passing event to Handler - Listener took '+elapsedTimeString(start_time), flush=True)
-        # slack_bot.post_message("","Starting handler on mock-bayestar event: {}".format(gcn_fake_alert['superevent_id']))
-        gw_streamer = GWStreamer(mode='mock')
-        gw_streamer.handle(gcn_fake_alert)
-        """
-        	
+       	
     elif mode=='all':
         try:
             consumer = Consumer(client_id=gcn['client_id'],
@@ -98,7 +90,7 @@ if __name__ == "__main__":
                     gw_streamer.handle(gcn_alert)
                 
                 if datetime.date.today().day != today:
-                    slack_bot.post_message("","`listener.py` has been running nonstop in {} mode for {} days".format(mode, init_day))
+                    slack_bot.post_message("","`listener.py` for `Auxiliary-Injector` has been running nonstop in {} mode for {} days".format(mode, init_day))
                     today = datetime.date.today().day
                     init_day +=1
 
