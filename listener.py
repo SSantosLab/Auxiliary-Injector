@@ -10,19 +10,18 @@ from argparse import ArgumentParser
 import yaml
 from yaml.loader import SafeLoader
 from gcn_kafka import Consumer
-from handlers.gwstreamer import GWStreamer
+from handlers.streamer import alertStreamer
 from handlers.emails import EmailBot
 from handlers.slack import SlackBot
-from test_hexes.mock_bayestar_event import makeBayestarMock
 import datetime
 from tests import testHandler
 
-allowedModes = ["test","all","test g","test x","test r","test v"]
-allowedChars = ["g","x","r","v"]
+allowedModes = ["test","all","test g","test x","test v"]
+allowedChars = ["g","x","v"]
 
 # Gamma ray: Einstein probe  gcn.notices.einstein_probe.wxt.alert
 # X ray: Swift gcn.notices.swift.bat.guano
-# Radio: No great option, yet
+# Radio (r): No great option, yet
 # Neutrino: IceCube : gcn.notices.icecube.lvk_nu_track_search
 
 # Other sources to consider: SuperNova Early Warning System (SNEWS)
@@ -36,7 +35,7 @@ if __name__ == "__main__":
     parser.add_argument('--mode',
                         default='all',
                         help='Chose a `mode` for listen to gcn alerts. ' +\
-                        'Default mode is `all`, which will include gamma ray (g), x-ray (x), radio (r), and neutrino events (v).' +\
+                        'Default mode is `all`, which will include gamma ray (g), x-ray (x), and neutrino events (v).' +\
                         'For offline testing of all modes, use `test` mode. ' +\
                         'For offline testing of one mode, use `test P`, where `P` is one of the chars associated with a different messenger'
                         choices=allowedModes)
@@ -47,7 +46,7 @@ if __name__ == "__main__":
     print("Listener Activating")
     print('Running Listener in {} mode...'.format(mode), flush=True)
     
-    gw_streamer = GWStreamer(mode=mode)
+    alert_streamer = alertStreamer(mode=mode)
     email_bot = EmailBot(mode=mode)
     slack_bot = SlackBot(mode=mode)
 
@@ -87,7 +86,7 @@ if __name__ == "__main__":
                     print('Trigger Received...')
                     gcn_alert = json.loads(message.value())
                     print('Passing event to Handler.', flush=True)
-                    gw_streamer.handle(gcn_alert)
+                    alert_streamer.handle(gcn_alert)
                 
                 if datetime.date.today().day != today:
                     slack_bot.post_message("","`listener.py` for `Auxiliary-Injector` has been running nonstop in {} mode for {} days".format(mode, init_day))
@@ -102,4 +101,4 @@ if __name__ == "__main__":
                                 emergency=True)
     else:
         raise ValueError:
-            print("Mode not supported. Supplied mode: {}. Allowed modes are {}.".format(mode,allowedModes)) 
+            print("Mode not supported.\nSupplied mode: {}.\nAllowed modes are {}.".format(mode,allowedModes)) 
