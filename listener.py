@@ -24,6 +24,12 @@ allowedChars = ["g","x","v"]
 # Radio (r): No great option, yet
 # Neutrino: IceCube : gcn.notices.icecube.lvk_nu_track_search
 
+subscriptionDict = {
+                    "g":"gcn.notices.einstein_probe.wxt.alert",
+                    "x":"gcn.notices.swift.bat.guano",
+                    "v":"gcn.notices.icecube.lvk_nu_track_search"
+                    }
+
 # Other sources to consider: SuperNova Early Warning System (SNEWS)
 
 def elapsedTimeString(start):
@@ -76,7 +82,9 @@ if __name__ == "__main__":
         try:
             consumer = Consumer(client_id=gcn['client_id'],
                                 client_secret=gcn['client_secret'])
-            consumer.subscribe(['igwn.gwalert'])
+            # initial
+            for value in subscriptionDict.values(): 
+                consumer.subscribe([value])
 
             today = datetime.date.today().day
             init_day = 1
