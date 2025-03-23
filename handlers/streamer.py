@@ -24,7 +24,8 @@ import ephem
 import json
 import os
 from astropy.coordinates import ICRS
-
+from .slack import SlackBot
+from .emails import EmailBot
 
 subscriptionDict = {
                     "g":"gcn.notices.einstein_probe.wxt.alert",
@@ -167,6 +168,26 @@ class Alert():
             raise ValueError
             print("inst supplied to parseGammaRay is not valid. Provided inst: {}. Valid inst: {}.".format(inst,["BAT-GUANO"]))
 
+    def prepMessage(self):
+        finalString = "*Instrument*: {}\n".format(self.inst)+\
+                      "*Quality*: {}\n".format(self.quality)+\
+                      "*Alert type*: {}\n".format(self.alertType)+\
+                      "*Trigger time*: {}\n".format(self.triggerTime)+\
+                      "*Alert time*: {}\n".format(self.alertTime)
+        if self.ra!=None and self.dec!=None:
+            finalString+="*Maximum probablity pointing*: ({},{})\n".format(self.ra,self.dec)
+        if self.pointError!=None:
+            finalString+="*Pointing error*: {} deg\n".format(self.pointError)             
+        if self.far!=None:
+            finalString+="*FAR*: {}\n".format(self.far) 
+        if self.nCoinc!=1:
+            finalString+="*Number of coincident events*: {}\n".format(self.nCoinc)
+        if self.comment!=None:
+            finalString+="*Comment*: {}+\n".format(self.comment)
+        if self.url!=None:
+            finalString+="*URL*: {}".format(self.url)
+        return finalString
+
 class plotMaker():
     def __init__(self,alert):
         self.alert = alert
@@ -177,10 +198,11 @@ class plotMaker():
         Function to call specific plots based on the type of alert
         """
 
-        allPlots = []
+        allPlots = {}
 
         if self.alert.ra!=None and self.alert.dec!=None:
-            allPlots.append(self.makeSkymap()) # Make a skymap
+            ky,val = self.makeSkymap() # Make a skymap
+            allPlots[ky] = val
 
         # Plot other things here, if needed
 
@@ -281,10 +303,10 @@ class plotMaker():
         # Closes all the figure windows.
         plt.close('all')
 
-        return skymap_plot
+        return skymap_plot,"Skymap"
 
 
-def handle(gcn_alert):
+def handle(gcn_alert,mode):
     """
     gcn_alert is a dict object of the .json message 
     """
@@ -296,12 +318,21 @@ def handle(gcn_alert):
     mode = modeInstDict[instrument]
 
     alert = Alert(mode,gcn_alert) # Parse the gcn_alert into the Alert object
+    
+    email_bot = EmailBot(mode=mode)
+    slack_bot = SlackBot(mode=mode)
+
+    slack_bot.post_message("","Received GCN for {} trigger, parsing".format(alert.inst))
 
     # Make plots
     plots = plotMaker(alert)
     plotPaths = plots.plotPaths
 
     # Post final messages to slack
-    
+    slack_bot.post_message("",alert.prepMessage())
+    for key, val in zip(plotPaths.keys(),plotPaths.values()):
+        slack_bot.post_image(key,val)
 
     # send emails, if necessary
+    # Skipping for now, might come back to this
+    
