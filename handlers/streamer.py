@@ -73,7 +73,7 @@ class Alert():
             self.parseXRay()
         else:
             raise ValueError
-                print("Mode supplied to Alert object does not match an allowed mode. Supplied mode: {}. Allowed modes: {}".format(self.mode,["x","v","g"]))
+            print("Mode supplied to Alert object does not match an allowed mode. Supplied mode: {}. Allowed modes: {}".format(self.mode,["x","v","g"]))
 
     def parseNeutrino(self,inst="Ice-Cube"):
         """

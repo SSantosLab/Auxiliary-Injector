@@ -1,4 +1,9 @@
 from handlers.streamer import Alert
+import json
+
+exampleDir = 
+
+gcn_alert = json.loads(message.value())
 
 def runAll():
     runXRay()

@@ -43,7 +43,7 @@ if __name__ == "__main__":
                         help='Chose a `mode` for listen to gcn alerts. ' +\
                         'Default mode is `all`, which will include gamma ray (g), x-ray (x), and neutrino events (v).' +\
                         'For offline testing of all modes, use `test` mode. ' +\
-                        'For offline testing of one mode, use `test P`, where `P` is one of the chars associated with a different messenger'
+                        'For offline testing of one mode, use `test P`, where `P` is one of the chars associated with a different messenger',
                         choices=allowedModes)
 
     args = parser.parse_args()
@@ -108,5 +108,5 @@ if __name__ == "__main__":
                                 text=traceback.format_exc(),
                                 emergency=True)
     else:
-        raise ValueError:
-            print("Mode not supported.\nSupplied mode: {}.\nAllowed modes are {}.".format(mode,allowedModes)) 
+        raise ValueError
+        print("Mode not supported.\nSupplied mode: {}.\nAllowed modes are {}.".format(mode,allowedModes)) 
