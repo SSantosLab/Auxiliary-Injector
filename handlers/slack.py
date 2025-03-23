@@ -44,29 +44,7 @@ class SlackBot():
         """
 
         client = WebClient(self.image_token)
-
-        # new_file = client.files_upload_v2(title="TestFile",filename=impath,content="Placeholder Text")
-
-        # file_url = new_file.get("file").get("permalink")
         return client.files_upload_v2(channel=self.image_channel,file=impath,title=title,initial_comment=comment)
-
-        # maybe use the below?
-        # upload_and_then_share_file = client.files_upload_v2(channel="C123456789",title="Test text data",filename="test.txt",content="Hi there! This is a text file!",initial_comment="Here is the file:")
-
-        # post = {}
-        # post["value1"] = ''
-        # post["value2"] = open(impath,'rb').read()
-
-        # requests.post(self._link, data=post)
-
-        # my_file = {'file' : (impath, open(impath, 'rb'), 'png')}
-
-        # payload={"filename":impath,"token":self.token,"channels":self.channel}
-
-        # dicto = {'token':self.token,'filename': impath, 'channels': self.channel}
-            
-        # return requests.post("https://slack.com/api/files.upload", params=payload, files=my_file)
-
 
     def post_message(self, subject: str, text: str) -> None:
         """Post text to slack"""
