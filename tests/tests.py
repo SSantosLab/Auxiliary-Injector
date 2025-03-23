@@ -1,41 +1,45 @@
-from handlers.streamer import Alert
+import os
 import json
+from handlers.streamer import Alert
 
-exampleDir = 
+dataDir = "../data/exampleJsons" 
 
-gcn_alert = json.loads(message.value())
-
-def runAll():
-    runXRay()
-    runGRay()
-    runNeutrino()
-    return 0
 class testHandler()
     def __init__(self,mode) -> None:
         self.mode = mode
         self.runTest()
 
-    def runTest(self): 
-        # Parse initial GCN into a text block that the slackBot can understand
-        self.parsed = self.parseGCN()
-        # Make necessary plots
-        self.plots = self.makePlots()
-        # Make slack posts
-        self.postToSlack()
-        # Make emails
-        self.sendEmails()
+    def runTest(self):
+        if self.mode=="all":
+           self.mode="x"
+           self.runXRay()
+           self.mode="g"
+           self.runGRay()
+           self.mode="v"
+           self.runNeutrino()
+        else:
+            if self.mode=="x":
+                self.runXRay()
+            elif self.mode=="v":
+                self.runNeutrino()
+            elif self.mode=="g":
+                self.runGRay()
+            else:
+                raise ValueError
+                print("Mode supplied to testHanlder is invalid. Supplied mode: {}. Valid modes: {}".format(self.mode,["x","v","g"]))
 
-    def parseGCN(self):
-        if self.mode=="":
+    def runXRay(self):
+        self.gcn = json.loads(os.path.join(dataDir,"einstein-probe-example.json"))
+        self.parseAlert()
+    def runGRay(self):
+        self.gcn = json.loads(os.path.join(dataDir,"swift-bat-guano-example.json"))
+        self.parseAlert()
+    def runNeutrino(self):
+        self.gcn = json.loads(os.path.join(dataDir,"icecube-track-alert-example.json"))
+        self.parseAlert()
+        # Adding a second call here to test over both the track alert and the LVK coordinated search 
+        self.gcn = json.loads(os.path.join(dataDir,"icecube-lvk-track-search-example.json"))
+        self.parseAlert()
 
-        elif self.mode=="":
-
-        elif self.mode=="":
-
-
-    def makePlots(self):
-        
-    def postToSlack(self):
-        
-    def sendEmails(self):
-    
+    def parseAlert(self): 
+        Alert(self.mode,self.gcn)
