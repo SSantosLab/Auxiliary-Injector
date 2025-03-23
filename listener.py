@@ -94,7 +94,7 @@ if __name__ == "__main__":
                     print('Trigger Received...')
                     gcn_alert = json.loads(message.value())
                     print('Passing event to Handler.', flush=True)
-                    alert_streamer.handle(gcn_alert)
+                    alertStreamer.handle(gcn_alert)
                 
                 if datetime.date.today().day != today:
                     slack_bot.post_message("","`listener.py` for `Auxiliary-Injector` has been running nonstop in {} mode for {} days".format(mode, init_day))
