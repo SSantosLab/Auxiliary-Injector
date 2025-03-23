@@ -106,19 +106,15 @@ class EmailBot():
         
             emergency_list = {
                 'names': [
-                    'Andre Santos',
-                    'Nora Sherman',
                     'Jim Annis',
                     'Marcelle Soares-Santos',
                     'Sean MacBride',
                     'Isaac McMahon'
                 ],
                 'emails': [
-                    'andsouzasanttos@gmail.com',
-                    'norafs@umich.edu',
                     'annis@fnal.gov',
                     'mssantos@umich.edu',
-                    'sean.p.macbride@gmail.com',
+                    'sean.macbride@physik.uzh.ch',
                     'isaac.mcmahon@physik.uzh.ch'
                 ]
             }
