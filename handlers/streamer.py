@@ -26,7 +26,8 @@ import os
 from astropy.coordinates import ICRS
 from .slack import SlackBot
 from .emails import EmailBot
-
+from matplotlib.patches import Circle
+import numpy as np
 subscriptionDict = {
                     "g":"gcn.notices.einstein_probe.wxt.alert",
                     "x":"gcn.notices.swift.bat.guano",
@@ -36,7 +37,7 @@ subscriptionDict = {
 modeInstDict = {"Ice-Cube":"v",
                 "BAT-GUANO":"g",
                 "WXT":"x"}
-
+baseDir = "/data/des70.a/data/desgw/O4/Aux-Monitor/data/output/"
 class Alert():
     """
 
@@ -82,7 +83,8 @@ class Alert():
 
         if inst=="Ice-Cube":
             self.inst = inst
-            try self.gcn_alert["additional_info"]:
+            try:
+                test = self.gcn_alert["additional_info"]
             # Neutrino only track event
                 self.quality = list(self.gcn_alert["additional_info"])[1] # Bronze or Gold
                 self.ra = self.gcn_alert["ra"]
@@ -96,7 +98,7 @@ class Alert():
                 self.shortName = self.gcn_alert["additional_info"]
                 self.pointError = self.gcn_alert["ra_dec_error"]
                 self.nCoinc = 1
-            else:
+            except:
             # LVK coordinated search
                 self.quality = "Platinum"
                 self.ra = self.gcn_alert["most_probable_direction"]["ra"]
@@ -108,7 +110,7 @@ class Alert():
                 self.shortName = self.gcn_alert["type"]
                 baseline = 0
                 for event in self.gcn_alert["coincident_events"]:
-                    baseline+=event["ra_dec_error"]**2
+                    baseline+=event["localization"]["ra_dec_error"]**2
                 self.pointError = np.sqrt(baseline)
                 self.nCoinc = self.gcn_alert["coincident_events"]
                 self.far = None # Probably best to pull this from the GW GCN?
@@ -191,7 +193,7 @@ class Alert():
 class plotMaker():
     def __init__(self,alert):
         self.alert = alert
-        self.plotPaths = plotHandler()
+        self.plotPaths = self.plotHandler()
 
     def plotHandler(self):
         """
@@ -246,6 +248,8 @@ class plotMaker():
 
         if self.alert.pointError!=None:
             # Contour the skymap here with a circle, radius here
+            ax_inset.add_patch(plt.Circle((self.alert.ra,self.alert.dec),self.alert.pointError))
+            ax.add_patch(plt.Circle((self.alert.ra,self.alert.dec),self.alert.pointError))
 
         ### Add galactic plane and +- 15 deg to skymap plot
 
@@ -311,9 +315,9 @@ def handle(gcn_alert,mode):
     gcn_alert is a dict object of the .json message 
     """
     
-    try gcn_alert["instrument"]:
+    try:
         instrument = gcn_alert["instrument"]
-    else:
+    except:
         instrument = "Ice-Cube"
     mode = modeInstDict[instrument]
 
@@ -331,8 +335,8 @@ def handle(gcn_alert,mode):
     # Post final messages to slack
     slack_bot.post_message("",alert.prepMessage())
     for key, val in zip(plotPaths.keys(),plotPaths.values()):
-        slack_bot.post_image(key,val)
+        slack_bot.post_image(key,val,"Skymap")
 
     # send emails, if necessary
     # Skipping for now, might come back to this
-    
+

@@ -10,11 +10,11 @@ from argparse import ArgumentParser
 import yaml
 from yaml.loader import SafeLoader
 from gcn_kafka import Consumer
-from handlers.streamer import alertStreamer
+from handlers.streamer import Alert
 from handlers.emails import EmailBot
 from handlers.slack import SlackBot
 import datetime
-from tests import testHandler
+from tests.tests import testHandler
 
 allowedModes = ["test","all","test g","test x","test v"]
 allowedChars = ["g","x","v"]
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     print("Listener Activating")
     print('Running Listener in {} mode...'.format(mode), flush=True)
     
-    alert_streamer = alertStreamer(mode=mode)
+    # alert_streamer = alertStreamer(mode=mode)
     email_bot = EmailBot(mode=mode)
     slack_bot = SlackBot(mode=mode)
 
@@ -94,7 +94,7 @@ if __name__ == "__main__":
                     print('Trigger Received...')
                     gcn_alert = json.loads(message.value())
                     print('Passing event to Handler.', flush=True)
-                    alertStreamer.handle(gcn_alert)
+                    Alert(gcn_alert)
                 
                 if datetime.date.today().day != today:
                     slack_bot.post_message("","`listener.py` for `Auxiliary-Injector` has been running nonstop in {} mode for {} days".format(mode, init_day))

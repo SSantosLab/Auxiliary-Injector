@@ -1,10 +1,11 @@
 import os
 import json
 from handlers.streamer import Alert
+from handlers.streamer import handle
 
-dataDir = "../data/exampleJsons" 
+dataDir = "/data/des70.a/data/desgw/O4/Aux-Monitor/data/exampleJsons" 
 
-class testHandler()
+class testHandler():
     def __init__(self,mode) -> None:
         self.mode = mode
         self.runTest()
@@ -29,17 +30,23 @@ class testHandler()
                 print("Mode supplied to testHanlder is invalid. Supplied mode: {}. Valid modes: {}".format(self.mode,["x","v","g"]))
 
     def runXRay(self):
-        self.gcn = json.loads(os.path.join(dataDir,"einstein-probe-example.json"))
-        self.parseAlert()
+        with open(os.path.join(dataDir,"einstein-probe-example.json")) as f:
+            self.gcn = json.load(f)
+
+        handle(self.gcn,self.mode)
     def runGRay(self):
-        self.gcn = json.loads(os.path.join(dataDir,"swift-bat-guano-example.json"))
-        self.parseAlert()
+        with open(os.path.join(dataDir,"swift-bat-guano-example.json")) as f:
+            self.gcn = json.load(f)
+        handle(self.gcn,self.mode)  
+ 
     def runNeutrino(self):
-        self.gcn = json.loads(os.path.join(dataDir,"icecube-track-alert-example.json"))
-        self.parseAlert()
+        with open(os.path.join(dataDir,"icecube-track-alert-example.json")) as f:
+            self.gcn = json.load(f)
+        handle(self.gcn,self.mode) 
         # Adding a second call here to test over both the track alert and the LVK coordinated search 
-        self.gcn = json.loads(os.path.join(dataDir,"icecube-lvk-track-search-example.json"))
-        self.parseAlert()
+        with open(os.path.join(dataDir,"icecube-lvk-track-search-example.json")) as f:
+            self.gcn = json.load(f)
+        handle(self.gcn,self.mode)
 
     def parseAlert(self): 
         Alert(self.mode,self.gcn)

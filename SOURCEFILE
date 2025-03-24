@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [[ $HOSTNAME =~ "des"* ]] ; then
+    conda activate /data/des80.a/data/imcmahon/micromamba/envs/mi38
+    export ROOT_DIR="./" # 12-13-22 note to change to more permanent dir  after testing
+    export DATA_DIR="$ROOT_DIR/data"
+fi
