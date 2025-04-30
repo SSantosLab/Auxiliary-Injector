@@ -13,7 +13,7 @@ Clone the repository and install dependencies:
 ```
 git clone https://github.com/SSantosLab/Auxiliary-Injector.git
 cd Auxiliary-Injector
-pip install -r requirements.txt # I'll add a requirements.txt file soon
+pip install -r requirements.txt
 ```
 
 (You may also wish to install in a virtual environment.)
@@ -22,6 +22,7 @@ pip install -r requirements.txt # I'll add a requirements.txt file soon
 ```
 Auxiliary-Injector/
 ├── listener.py                    # The top-level listener script that listens for ToO alerts
+├── configs/                       # Folder containing credentials for gcn, slack, and email alerts
 ├── handlers/                      # Core package
 │   ├── streamer.py                # Alert parsing, JSON handling, slack communication
 │   ├── slack.py                   # Slack utilities
