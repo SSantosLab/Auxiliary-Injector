@@ -1,7 +1,7 @@
 """
 Python script to listen from non-LVK alerts trough gcn.
 """
-
+from tests.tests import parse_json_from_bytes
 import glob
 import time
 import traceback
@@ -15,6 +15,7 @@ from handlers.emails import EmailBot
 from handlers.slack import SlackBot
 import datetime
 from tests.tests import testHandler
+from handlers.streamer import handle
 
 allowedModes = ["test","all","test g","test x","test v"]
 allowedChars = ["g","x","v"]
@@ -92,9 +93,14 @@ if __name__ == "__main__":
             while True:
                 for message in consumer.consume(timeout=10):
                     print('Trigger Received...')
-                    gcn_alert = json.loads(message.value())
+                    if message.value()['type']=='IceCube LVK Alert Nu Track Search': # For the one strangely formatted gcn type
+                        gcn_alert=parse_json_from_bytes(message.value())
+                    else:
+                        gcn_alert = json.loads(message.value())
+#                    gcn_alert = dict(message.value())
                     print('Passing event to Handler.', flush=True)
-                    Alert(gcn_alert)
+                    print(gcn_alert)
+                    handle(gcn_alert,"placeholder")
                 
                 if datetime.date.today().day != today:
                     slack_bot.post_message("","`listener.py` for `Auxiliary-Injector` has been running nonstop in {} mode for {} days".format(mode, init_day))

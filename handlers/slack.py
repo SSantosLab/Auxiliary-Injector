@@ -26,7 +26,6 @@ class SlackBot():
         self.mode = mode
         
         self.image_config = os.path.join(ROOT,"configs","slack_image_creds.txt")
-        print(self.mode,self.image_config,self.CONFIG)
         with open(self.image_config) as f:
             self.image_token,self.image_channel =  np.loadtxt(self.image_config,dtype=str,delimiter=",")
         
