@@ -3,8 +3,9 @@
 Auxiliary-Injector is a lightweight Python tool designed to handle auxiliary data injection into processing pipelines, with a focus on flexibility and integration with astronomical alert systems and scheduling frameworks.
 
 ## Features
-	•	Ingestion of non-GW ToO event triggers (e.g., neutrino, gamma ray, and x-ray)
-	•	Interfaces cleanly with Slack 
+
+ - Ingestion of non-GW ToO event triggers (e.g., neutrino, gamma ray, and x-ray)
+ - Interfaces cleanly with Slack 
 
 ## Installation
 
